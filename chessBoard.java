@@ -20,8 +20,6 @@ public class chessBoard {
      This class holds an 8x8 board. Every method in the board in one way or another
      interacts with board. They can either modify the board, copy it, print the board
      (or print a message), move a piece, or do something if a condition is met.
-     [List the rules; use chess wiki]****** explain at top and tell what function imitates that
-     [also to stay consistent use getColor() method]*******
      */
     private final int boardHorizontal = 8;
     private final int boardVertical = 8;
@@ -32,11 +30,11 @@ public class chessBoard {
     // is index 7
     private LinkedList<chessPiece[][]> stackPrevMove;
     // holds previous chessboards
-    private LinkedList<chessPiece[][]> QueueNextMove;
+    private LinkedList<chessPiece[][]> stackNextMove;
     // holds next Move
 
     enum Color {BLACK, WHITE};
-    private enum Piece {ROOK__, KNIGHT, BISHOP, QUEEN_, KING__, PAWN__}
+    enum Piece {ROOK__, KNIGHT, BISHOP, QUEEN_, KING__, PAWN__}
 
 
 
@@ -71,10 +69,28 @@ public class chessBoard {
         }
 
 
+        public void incrementSpecialMove() {
+            specialMove++;
+        }
+        // increases specialMove by 1; need for chessBoardGUI
+
+
         public int getHorizontalPosition() {
-            // returns a piece horizontal position
+            // returns a piece horizontal position; need for chessBoardGUI
             return horizontalPosition;
         }
+
+
+        public void changeHorizontalPosition(int x) {
+            horizontalPosition = x;
+        }
+        // changes horizontalPosition; need for chessBoardGUI
+
+
+        public void changeVerticalPosition(int y) {
+            verticalPosition = y;
+        }
+        // changes verticalPosition; need for chessBoardGUI
 
 
         public int getVerticalPosition() {
@@ -89,54 +105,28 @@ public class chessBoard {
         }
 
 
-        public Piece getChessPieceName() {
-            // returns a piece name
-            return chessPieceName;
+        public int getSpecialMove() {
+            // return the special move int; need for chessBoardGUI
+            return specialMove;
         }
 
 
-        public Piece getPiece (String p) {
-            /**
-             This method returns the needed piece from the string p.
-
-             @param p - string of required Piece
-             @return Piece
-             */
-            if (p.equals("pawn")) {
-                return Piece.PAWN__;
-            } else if (p.equals("rook")) {
-                return Piece.ROOK__;
-            } else if (p.equals("knight")) {
-                return Piece.KNIGHT;
-            } else if (p.equals("bishop")) {
-                return Piece.BISHOP;
-            } else if (p.equals("queen")) {
-                return Piece.QUEEN_;
-            } else {
-                return Piece.KING__;
-            }
+        public Piece getChessPieceName() {
+            // returns a piece name; need for chessBoardGUI
+            return chessPieceName;
         }
 
 
         public void changeGUI(JLabel pieceDisplay) {
             guiPiece = pieceDisplay;
         }
+        // changes GUI; need for chessBoardGUI
 
 
         public JLabel returnGUI() {
             return guiPiece;
         }
-
-
-        public Boolean compareTo(String p) {
-            Piece piece = getPiece(p);
-
-            if (chessPieceName.equals(piece)) {
-                return true;
-            }
-
-            return false;
-        }
+        // returns GUI; need for chessBoardGUI
 
 
         public boolean isMoveLegal(int newVertical, int newHorizontal, chessPiece[][] currentBoard) {
@@ -644,11 +634,10 @@ public class chessBoard {
     }
 
 
-
     public chessBoard () {
         board = new chessPiece[boardVertical][boardHorizontal];
         stackPrevMove = new LinkedList<chessPiece[][]>();
-        QueueNextMove = new LinkedList<chessPiece[][]>();
+        stackNextMove = new LinkedList<chessPiece[][]>();
 
         for (int i = 0; i < boardVertical; i++) {
             // this loop sets up each piece going vertically
@@ -697,8 +686,8 @@ public class chessBoard {
             }
         }
 
-        System.out.println("\nWHITE STARTS\n");
-        printBoard(board);
+        //System.out.println("\nWHITE STARTS\n"); **** uncomment this to play on the termial
+        //printBoard(board); ****
     }
 
     public chessPiece[][] getBoard() {
@@ -708,6 +697,12 @@ public class chessBoard {
         @return current chessboard
          */
         return board;
+    }
+
+
+    public void changeBoard(chessPiece[][] newBoard) {
+        //changes the board
+        board = newBoard;
     }
 
 
@@ -968,7 +963,6 @@ public class chessBoard {
                             tempBoard[king.getVerticalPosition()][king.getHorizontalPosition()] = king;
                             tempBoard[p.getVerticalPosition()][p.horizontalPosition] = null;
 
-
                             if (isMyKingInCheck(king, tempBoard)) {
                                 // if current square would put the king in check then break
                                 break;
@@ -1156,6 +1150,12 @@ public class chessBoard {
         }
     }
 
+    public chessPiece getKing(String king) {
+        if (king.equals("black")) {
+            return blackKing;
+        }
+        return whiteKing;
+    }
 
     public void printInvalidInput(Color colour) {
         // print a message: invalid input message
@@ -1172,7 +1172,7 @@ public class chessBoard {
     }
 
 
-    private void specialMoveCheck(Color colour) {
+    public void specialMoveCheck(Color colour) {
         // change all pieces that have moved once to 2
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -1234,12 +1234,12 @@ public class chessBoard {
                 stackPrevMove.removeLast();
                 // remove current board
 
-                System.out.println("\nCannot Move There " + piece.getColor() +
-                        " Player, King Will be in check!\n");
-                System.out.println(piece.getColor() + "S TURN AGAIN\n");
+                //System.out.println("\nCannot Move There " + piece.getColor() +
+                //       " Player, King Will be in check!\n");
+                //System.out.println(piece.getColor() + "S TURN AGAIN\n");
 
                 board = tempBoard;
-                printBoard(board);
+                //printBoard(board);
 
                 piece.verticalPosition = y;
                 piece.horizontalPosition = x;
@@ -1250,16 +1250,16 @@ public class chessBoard {
             return true;
             }
 
-        System.out.println("\nCannot Move " + piece.chessPieceName +
-                " Here " + piece.getColor() + " Player.\n\nMove Again.\n");
-        System.out.println(piece.getColor() + "S TURN AGAIN");
-        printBoard(board);
+        //System.out.println("\nCannot Move " + piece.chessPieceName +
+        //        " Here " + piece.getColor() + " Player.\n\nMove Again.\n");
+        //System.out.println(piece.getColor() + "S TURN AGAIN");
+        //printBoard(board);
 
         return false;
     }
 
 
-    private chessPiece[][] copyBoard(chessPiece[][] newBoard) {
+    public chessPiece[][] copyBoard(chessPiece[][] newBoard) {
         // copies the current board but the chess pieces refer to the same
         // piece as before
         chessPiece[][] tempBoard = new chessPiece[8][8];
@@ -1280,17 +1280,10 @@ public class chessBoard {
          board and checks if any enemy piece can checkmate a king.
 
          @param newBoard = the board that will be used to check if a king is in check
-         @param colour = color of king that will be checked
+         @param king =  king that will be checked if they are in check
 
          @return true - king is in check; false - king is not in check
          */
-        //chessPiece king;
-
-       // if (colour.equals(Color.WHITE)) {
-         //   king = whiteKing;
-       // } else {
-          //  king = blackKing;
-        //}
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -1325,7 +1318,6 @@ public class chessBoard {
          @return true - if player who called won; false - if player who called did
          not win
          */
-
         int winCondition = 8;
         // number of places king can move too; will reduce if there is a chess piece
         // occupying one of those spots
@@ -1526,7 +1518,7 @@ public class chessBoard {
                 // only in vertical position 0 or 7 can be promoted
             Scanner myObj = new Scanner(System.in);
 
-            System.out.println(piece.getColor() + " Player Change Pawn to:\n");
+            //System.out.println(piece.getColor() + " Player Change Pawn to:\n");
             String userInput = myObj.nextLine();
 
             switch (userInput) {
@@ -1538,6 +1530,25 @@ public class chessBoard {
                 default -> pawnPromotion(piece);
             }
             }
+        }
+    }
+
+
+    public void pawnPromoteGUI(chessPiece piece, String string) {
+        /**
+         This method promote any pawn if it reaches any end of the board. This
+         method is specific for chessBoardGUI.
+
+         @param piece - chesspiece that will be promoted
+         @param string - name of the promotion
+         */
+        switch (string) {
+            // pawn can only be promoted to rook, knight, bishop, and queen
+            case "rook" -> piece.chessPieceName = Piece.ROOK__;
+            case "knight" -> piece.chessPieceName = Piece.KNIGHT;
+            case "bishop" -> piece.chessPieceName = Piece.BISHOP;
+            case "queen" -> piece.chessPieceName = Piece.QUEEN_;
+            default -> pawnPromotion(piece);
         }
     }
 
@@ -1576,6 +1587,10 @@ public class chessBoard {
         stackPrevMove.add(storeBoard);
     }
 
+    public void clearNextMove() {
+        stackNextMove.clear();
+    }
+
 
     public Boolean previousMove () {
         /**
@@ -1591,7 +1606,7 @@ public class chessBoard {
         // checks if there is anything in the stack
 
         storeNextMove(board);
-        // stores current board to stackNextMove
+        // stores current board to QueueNextMove
 
         board = stackPrevMove.removeLast();
 
@@ -1612,8 +1627,19 @@ public class chessBoard {
         return true;
     }
 
+    public chessPiece[][] getPreviousMove() {
+        /**
+         This method returns the last element in the stack without removing it.
 
-    private void storeNextMove(chessPiece[][] newBoard) {
+         @return last element of a stack; else return null if empty
+         */
+        if (stackPrevMove.isEmpty()) return null;
+
+        return stackPrevMove.getLast();
+    }
+
+
+    public void storeNextMove(chessPiece[][] newBoard) {
         /**
          This method store the current board (newBoard) to a stack before it
          is modified in other methods.
@@ -1644,7 +1670,7 @@ public class chessBoard {
             }
         }
 
-        QueueNextMove.add(storeBoard);
+        stackNextMove.add(storeBoard);
     }
 
 
@@ -1658,13 +1684,13 @@ public class chessBoard {
          @return true - if it can replace current board with next board; false
                 - if the is empty
                 */
-        if (QueueNextMove.isEmpty()) return false;
+        if (stackNextMove.isEmpty()) return false;
         // check if stackNextMove is empty
 
         storePreviousMove(board);
         // stores current board to stackPrevMove
 
-        board = QueueNextMove.pop();
+        board = stackNextMove.removeLast();
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {

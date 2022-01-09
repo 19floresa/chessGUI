@@ -1,14 +1,14 @@
+// Alexander Flores
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+
 
 public class MyPanel extends JLayeredPane {
-    //Color colour;
+    /**
+     This class creates a chessboard panel.
+     */
     MyPanel() {
-        //colour = color;
         this.setPreferredSize(new Dimension(800, 800));
     }
 
